@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({log: ["info", "query", "warn", "error"]});
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -40,6 +40,20 @@ app.post('/hobbies', async (req, res) => {
 })
 
 
+// update a hobby
+
+app.patch('/hobbies/:id', async (req, res) => {
+    const id = Number(req.params.id)
+    const updatedHobby = await prisma.hobby.update({data: req.body, where: {id}, include: {user: true}})
+    res.send(updatedHobby)
+})
+
+// delete a hobby
+app.delete('/hobbies/:id', async (req, res) => {
+    const id = Number(req.params.id)
+    const deletedHobby = await prisma.hobby.delete({where: {id}})
+    res.send(deletedHobby)
+})
 
 
 
@@ -72,6 +86,22 @@ app.post('/users', async (req, res) => {
     const newUser = await prisma.user.create({data: req.body, include: { hobbies: true}})
     res.send(newUser)
 })
+
+//update a user
+app.patch('/users/:id', async (req, resp) => {
+    const id = Number(req.params.id)
+    const updatedUser = await prisma.user.update({data: req.body, where: {id}, include: {hobbies: true}})
+    resp.send(updatedUser)
+})
+
+// Delete a user
+app.delete('/users/:id',async (req, res) => {
+    const id = Number(req.params.id)
+    const deletedUser = await prisma.user.delete({where: {id}})
+    res.send(deletedUser)
+})
+
+
 
 app.listen(port, () => {
   console.log(`Check: http://localhost:${port}`);
