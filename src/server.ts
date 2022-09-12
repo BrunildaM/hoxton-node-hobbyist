@@ -66,6 +66,13 @@ app.get("/users/:id", async (req, res) => {
   }
 });
 
+
+// create a user 
+app.post('/users', async (req, res) => {
+    const newUser = await prisma.user.create({data: req.body, include: { hobbies: true}})
+    res.send(newUser)
+})
+
 app.listen(port, () => {
   console.log(`Check: http://localhost:${port}`);
 });
